@@ -1,0 +1,8 @@
+all:
+  children:
+    web_servers:
+      hosts:
+        web1:
+          ansible_host: 10.5.0.3
+      vars:
+        apache_listen_port: 80

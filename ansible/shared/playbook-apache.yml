@@ -1,0 +1,36 @@
+- hosts: web_servers
+  become: false
+
+  vars:
+    server_name: "web"
+    message: "Bienvenue au DST"
+
+  tasks:
+    - name: install apache2
+      apk:
+        name: apache2
+        state: present
+
+    - name: Ensure Apache is started and enabled
+      service:
+        name: apache2
+        state: started
+        enabled: true
+
+    - name: Configure Apache to listen on correct port
+      lineinfile:
+        path: /etc/apache2/httpd.conf
+        regexp: '^Listen '
+        line: 'Listen {{ apache_listen_port }}'
+      notify: restart apache2
+
+    - name: Deploy index.html from template
+      template:
+        src: templates/index.html.j2
+        dest: /var/www/localhost/htdocs/index.html
+
+  handlers:
+    - name: restart apache2
+      service:
+        name: apache2
+        state: restarted
